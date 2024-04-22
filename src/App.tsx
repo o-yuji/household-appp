@@ -82,14 +82,20 @@ function App() {
       }
   }
 
-  const handleDeleteTransaction = async (transactionId:string) => {
+  const handleDeleteTransaction = async (transactionIds: string | readonly string[]) => {
     //firestoreからデータを削除
     try {
-      await deleteDoc(doc(db, "Transactions", transactionId));
-      const filterdTransactions = transactions.filter((transaction) => {
-        return transaction.id !== transactionId
-      })
+      const idsToDelete = Array.isArray(transactionIds) ? transactionIds : [transactionIds]
+
+      for (const id of idsToDelete) {
+        await deleteDoc(doc(db, "Transactions", id));
+      }
+      
+      const filterdTransactions = transactions.filter(
+        (transaction) => !idsToDelete.includes(transaction.id)
+      )
       setTransactions(filterdTransactions)
+
     }catch(err){
       if (isFireStoreError(err)) {
           console.error('Firestore_error:', err)
@@ -139,12 +145,15 @@ function App() {
             />
             <Route
               path="/report"
-              element={<Report
-                currentMonth={currentMonth}
-                setCurrentMonth={setCurrentMonth}
-                monthlyTransactions={monthlyTransactions}
-                isLoading={isLoading}
-              />}
+              element={
+                <Report
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  monthlyTransactions={monthlyTransactions}
+                  isLoading={isLoading}
+                  onDeleteTransaction={handleDeleteTransaction}
+                />
+              }
             />
           <Route path="*" element={<NoMatch/>} />
         </Route>

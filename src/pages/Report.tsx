@@ -12,9 +12,10 @@ interface ReportProps {
   setCurrentMonth: React.Dispatch<React.SetStateAction<Date>>,
   monthlyTransactions: Transaction[],
   isLoading: boolean,
+  onDeleteTransaction: (transactionId: string | readonly string[]) => Promise<void>;
 }
 
-const Report = ({currentMonth, setCurrentMonth, monthlyTransactions, isLoading}:ReportProps) => {
+const Report = ({currentMonth, setCurrentMonth, monthlyTransactions, isLoading, onDeleteTransaction}:ReportProps) => {
   const commonPaperStyle = {
     height: { sx: "auto", md: "400px" },
     display: "flex",
@@ -37,7 +38,10 @@ const Report = ({currentMonth, setCurrentMonth, monthlyTransactions, isLoading}:
         </Paper>
       </Grid>
       <Grid item xs={12}>
-        <TransactionTable monthlyTransactions={monthlyTransactions} />
+        <TransactionTable
+          monthlyTransactions={monthlyTransactions}
+          onDeleteTransaction={onDeleteTransaction}
+        />
       </Grid>
     </Grid>
   )
